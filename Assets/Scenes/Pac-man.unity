@@ -476,7 +476,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 385722e12811c6848a354c4152186a88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.5
+  speed: 0.7
   pelletTilemap: {fileID: 1518757175}
   emptyTile: {fileID: 11400000, guid: b3cc2869ff7982a419360cadbe92b6bf, type: 2}
   eatPelletSound: {fileID: 8300000, guid: 65c8cadf2f48b354692f14ca297ea1b6, type: 3}
@@ -492,7 +492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 385722e12811c6848a354c4152186a88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.5
+  speed: 0.7
   pelletTilemap: {fileID: 1518757175}
   emptyTile: {fileID: 11400000, guid: b3cc2869ff7982a419360cadbe92b6bf, type: 2}
   eatPelletSound: {fileID: 8300000, guid: 65c8cadf2f48b354692f14ca297ea1b6, type: 3}

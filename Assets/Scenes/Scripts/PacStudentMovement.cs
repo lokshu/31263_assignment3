@@ -25,7 +25,7 @@ public class PacStudentMovement : MonoBehaviour
         waypoints[3] = startPos + new Vector3(0, -1.38f, 0);
 
         QualitySettings.vSyncCount = 0;  // Disable v-sync
-        Application.targetFrameRate = 10;
+        Application.targetFrameRate = 30;
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
        
