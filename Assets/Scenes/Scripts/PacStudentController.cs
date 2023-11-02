@@ -72,7 +72,7 @@ public class PacStudentController : MonoBehaviour
                     audioSource.PlayOneShot(moveEmptySound);
                 }
             }
-            if(dustGas<15){
+            if(dustGas<10){
                 dustGas = dustGas + 5;
             }
         }
