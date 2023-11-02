@@ -19,6 +19,8 @@ public class PacStudentController : MonoBehaviour
     public AudioClip moveEmptySound;
     private AudioSource audioSource; 
     private Vector2 previousPosition;
+    private int dustGas=0; // add some gas to dust system each time when pac student move
+    public ParticleSystem dustParticles;
     
     void Start()
     {
@@ -30,8 +32,7 @@ public class PacStudentController : MonoBehaviour
         PacStudentIsStop(true);
         audioSource = GetComponent<AudioSource>();
         QualitySettings.vSyncCount = 0;
-       
-
+        dustParticles.Play();
     }
     
     void Update()
@@ -39,6 +40,22 @@ public class PacStudentController : MonoBehaviour
         GatherInput();
         TryMove();
         GetPoint();
+        MovementDust();
+    }
+    void MovementDust(){
+        if(dustGas>0){
+            if (!dustParticles.isPlaying)
+            {
+                dustParticles.Play();
+            }
+            dustGas--;      
+        }else{
+            if (dustParticles.isPlaying)
+            {
+                dustParticles.Stop();
+            }     
+        }
+        
     }
     void GetPoint(){
         Vector3Int currentCellPosition = levelTilemap.WorldToCell(transform.position);
@@ -54,6 +71,9 @@ public class PacStudentController : MonoBehaviour
                 if (!audioSource.isPlaying){
                     audioSource.PlayOneShot(moveEmptySound);
                 }
+            }
+            if(dustGas<15){
+                dustGas = dustGas + 5;
             }
         }
         previousPosition = currentPosition;
