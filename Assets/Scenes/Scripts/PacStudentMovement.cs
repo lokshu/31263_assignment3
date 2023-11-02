@@ -28,7 +28,22 @@ public class PacStudentMovement : MonoBehaviour
         Application.targetFrameRate = 30;
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
+
+         if (audioSource == null)
+        {
+            Debug.LogError("No AudioSource found on the GameObject.");
+        }
+
+        if (eatPelletSound == null)
+        {
+            Debug.LogError("eatPelletSound clip is not assigned.");
+        }
        
+       if (audioSource != null && eatPelletSound != null)
+        {
+            Debug.Log("Playing sound");
+            audioSource.PlayOneShot(eatPelletSound);
+        }
         
     }
 
