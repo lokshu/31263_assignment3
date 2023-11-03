@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Pellet
+  - PacStudent
+  - TeleportRight
+  - TeleportLeft
   layers:
   - Default
   - TransparentFX

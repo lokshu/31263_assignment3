@@ -119,6 +119,17 @@ public class PacStudentController : MonoBehaviour
             LerpToPosition();
         }
     }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        float offset = cellSize*21 -cellSize/2;
+        if (other.CompareTag("TeleportRight")){
+            transform.position = new Vector3(transform.position.x - offset, transform.position.y, transform.position.z);
+            isLerping = false;
+        }else if (other.CompareTag("TeleportLeft")){
+            transform.position = new Vector3(transform.position.x + offset, transform.position.y, transform.position.z);
+            isLerping = false;
+        }
+    }
 
     bool CanMoveTo(Vector2 direction)
     {
