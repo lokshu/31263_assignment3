@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using TMPro;
 
 public class PacStudentController : MonoBehaviour
 {
@@ -24,6 +25,11 @@ public class PacStudentController : MonoBehaviour
     public ParticleSystem dustParticles;
     public AudioClip wallBumpSound; 
     public ParticleSystem wallBumpParticles;
+    private int GameScore = 0;
+    public TextMeshProUGUI ScoreTextBox;
+    private int ScorePellets = 10;
+    //private int ScoreCherry = 100;
+     
 
     void Start()
     {
@@ -71,6 +77,13 @@ public class PacStudentController : MonoBehaviour
             {
                 levelTilemap.SetTile(currentCellPosition, emptyTile);
                 audioSource.PlayOneShot(eatPelletSound);
+                GameScore = GameScore + ScorePellets;
+                ScoreTextBox.text = GameScore.ToString();
+                if(currentTile.name == "5"){
+                    
+                }else if (currentTile.name == "6"){
+                    
+                }
                 
             }else{
                 if (!audioSource.isPlaying){

@@ -826,6 +826,7 @@ MonoBehaviour:
   dustParticles: {fileID: 688348253}
   wallBumpSound: {fileID: 8300000, guid: 48b8d22cf68826041acf5b8c0a740f11, type: 3}
   wallBumpParticles: {fileID: 1011920388}
+  ScoreTextBox: {fileID: 193339876}
 --- !u!82 &464048628
 AudioSource:
   m_ObjectHideFlags: 0
