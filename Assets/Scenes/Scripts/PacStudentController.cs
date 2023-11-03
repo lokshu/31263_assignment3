@@ -11,6 +11,7 @@ public class PacStudentController : MonoBehaviour
     private Vector2 lastInput;
     private Vector2 currentInput;
     private bool isLerping;
+    private bool isHitWallSoundPlayed;
     private int[] walkableTiles = {0, 5, 6};
     private float cellSize = 0.32f;
     private Animator animator;
@@ -21,7 +22,9 @@ public class PacStudentController : MonoBehaviour
     private Vector2 previousPosition;
     private int dustGas=0; // add some gas to dust system each time when pac student move
     public ParticleSystem dustParticles;
-    
+    public AudioClip wallBumpSound; 
+    public ParticleSystem wallBumpParticles;
+
     void Start()
     {
         targetPosition = transform.position; // Initialize targetPosition to the start position of PacStudent.
@@ -33,6 +36,7 @@ public class PacStudentController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         QualitySettings.vSyncCount = 0;
         dustParticles.Play();
+        wallBumpParticles.Play();
     }
     
     void Update()
@@ -53,6 +57,7 @@ public class PacStudentController : MonoBehaviour
             if (dustParticles.isPlaying)
             {
                 dustParticles.Stop();
+                wallBumpParticles.Stop();
             }     
         }
         
@@ -75,7 +80,7 @@ public class PacStudentController : MonoBehaviour
             if(dustGas<10){
                 dustGas = dustGas + 5;
             }
-        }
+        } 
         previousPosition = currentPosition;
     }
     void GatherInput()
@@ -138,8 +143,14 @@ public class PacStudentController : MonoBehaviour
                     }else if( direction == Vector2.right){
                         animator.Play("Right");
                     }
-                    
+                    wallBumpParticles.Stop();
                     return true; 
+                } else {
+                    if(!isHitWallSoundPlayed){
+                        audioSource.PlayOneShot(wallBumpSound);
+                        isHitWallSoundPlayed = true;
+                        wallBumpParticles.Play();
+                    }
                 }
             }
         }
@@ -160,6 +171,7 @@ public class PacStudentController : MonoBehaviour
         direction  = direction * cellSize;
         targetPosition = (Vector2)transform.position + direction; 
         isLerping = true;
+        isHitWallSoundPlayed = false;
     }
 
     void LerpToPosition()
