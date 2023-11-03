@@ -8,6 +8,8 @@ TagManager:
   - PacStudent
   - TeleportRight
   - TeleportLeft
+  - Cherry
+  - Ghost
   layers:
   - Default
   - TransparentFX

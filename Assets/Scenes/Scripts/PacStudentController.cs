@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using TMPro;
+using System;
+using UnityEngine.SceneManagement;
 
 public class PacStudentController : MonoBehaviour
 {
+    private Vector2 initalPosition = new Vector2(-5.96f, 4.16f);
     public Tilemap levelTilemap;
     public float moveSpeed = 3.0f;
     private Vector2 targetPosition;
@@ -27,12 +30,31 @@ public class PacStudentController : MonoBehaviour
     public ParticleSystem wallBumpParticles;
     private int GameScore = 0;
     public TextMeshProUGUI ScoreTextBox;
+    public TextMeshProUGUI ScaredTimer;
+    public TextMeshProUGUI GameTimer;
+    public TextMeshProUGUI GameOverTextBox;
+    private int GhostScaredSec;
+    public AudioClip normalBackgroundMusic;
+    public AudioClip scaredBackgroundMusic; 
+    public GameObject backgroundMusic;
+    private AudioSource backgroundMusicAudioSource;
     private int ScorePellets = 10;
-    //private int ScoreCherry = 100;
-     
+    private int ScoreCherry = 100;
+    private int KillScaredGhost = 300;
+    private float timer = 1f;
+    private int ghostScaredSec = 0;
+    private int totalGameSec=0;
+    private int lifeLost=0;
+    private bool isGamePause = true;
+    private int gameOverCountDown = 3; 
+    public GameObject[] lifeIndictor;
+    public GameObject dustEffectPrefab;
+    private int firstCountDown=5;
+    GameObject[] ghosts;
 
     void Start()
     {
+        transform.position = initalPosition;
         targetPosition = transform.position; // Initialize targetPosition to the start position of PacStudent.
         previousPosition = targetPosition;
         Application.targetFrameRate = 60;
@@ -43,14 +65,26 @@ public class PacStudentController : MonoBehaviour
         QualitySettings.vSyncCount = 0;
         dustParticles.Play();
         wallBumpParticles.Play();
+        
+        backgroundMusicAudioSource = backgroundMusic.GetComponent<AudioSource>();
+
+        ghosts = GameObject.FindGameObjectsWithTag("Ghost");
     }
     
     void Update()
     {
-        GatherInput();
-        TryMove();
-        GetPoint();
-        MovementDust();
+        if(!isGamePause){
+            GatherInput();
+            TryMove();
+            GetPoint();
+            MovementDust();
+        }
+        timer -= Time.deltaTime; 
+        if (timer <= 0)
+        {
+            OnSecondPassed();
+            timer = 1f; 
+        }
     }
     void MovementDust(){
         if(dustGas>0){
@@ -82,7 +116,7 @@ public class PacStudentController : MonoBehaviour
                 if(currentTile.name == "5"){
                     
                 }else if (currentTile.name == "6"){
-                    
+                    GhostScaredStart();
                 }
                 
             }else{
@@ -141,6 +175,16 @@ public class PacStudentController : MonoBehaviour
         }else if (other.CompareTag("TeleportLeft")){
             transform.position = new Vector3(transform.position.x + offset, transform.position.y, transform.position.z);
             isLerping = false;
+        }else if (other.CompareTag("Cherry")){
+            GameScore = GameScore + ScoreCherry;
+            ScoreTextBox.text = GameScore.ToString();
+        }else if(other.CompareTag("Ghost")){
+            if(ghostScaredSec>0){
+                GameScore = GameScore + KillScaredGhost;
+                ScoreTextBox.text = GameScore.ToString();
+            }else{
+                PacStudentDie();
+            }
         }
     }
 
@@ -205,5 +249,100 @@ public class PacStudentController : MonoBehaviour
         {
             isLerping = false; 
         }
+    }
+    private void OnSecondPassed(){
+        if(ghostScaredSec>0){
+            ScaredTimer.text = ghostScaredSec.ToString();
+            ghostScaredSec--;
+        }else if(ghostScaredSec==0){
+            GhostScaredFinished();
+            ScaredTimer.text = "";
+        }
+        if(!isGamePause){
+            totalGameSec++;
+            GameTimer.text = SecondsToFormattedTime(totalGameSec);
+        }    
+
+        if(isGamePause){
+            if(firstCountDown>0){
+                firstCountDown--;
+                GameOverTextBox.text = (firstCountDown-1).ToString();
+                if(firstCountDown==1){
+                    GameOverTextBox.text = "GO!";
+                }else if(firstCountDown==0){
+                    isGamePause = false;
+                    GameOverTextBox.text = "";
+                }
+            }else{
+                if(gameOverCountDown>0){
+                    gameOverCountDown--;
+                }else{
+                    SceneManager.LoadScene("StartScene");
+                }
+            }
+        }
+    }
+    private void GhostScaredFinished(){
+        backgroundMusicAudioSource.clip = normalBackgroundMusic;
+        backgroundMusicAudioSource.loop = true;
+        backgroundMusicAudioSource.Play(); 
+
+        foreach (GameObject ghost in ghosts)
+        {
+            Animator ghostAnimator = ghost.GetComponent<Animator>();
+            if (ghostAnimator != null) 
+            {
+                ghostAnimator.Play("Left"); 
+            }
+        }
+    }
+    private void GhostScaredStart(){
+        backgroundMusicAudioSource.clip = scaredBackgroundMusic;
+        backgroundMusicAudioSource.loop = true;
+        backgroundMusicAudioSource.Play(); 
+        ghostScaredSec = 10;
+
+        foreach (GameObject ghost in ghosts)
+        {
+            Animator ghostAnimator = ghost.GetComponent<Animator>();
+            if (ghostAnimator != null) 
+            {
+                ghostAnimator.Play("Scared"); 
+            }
+        }
+    }
+    private void PacStudentDie(){
+        if(lifeLost<2){
+            lifeIndictor[lifeLost].SetActive(false);
+            lifeLost++;
+            Instantiate(dustEffectPrefab, transform.position, Quaternion.identity);
+            transform.position = initalPosition;
+            targetPosition = transform.position; 
+            previousPosition = targetPosition;
+        }else{
+            GameOver();
+        }
+    }
+    private void GameOver(){
+        isGamePause = true;
+        GameOverTextBox.text = "Game Over!!";
+        if (PlayerPrefs.HasKey("HighScore")) 
+        {
+            int savedHighScore = PlayerPrefs.GetInt("HighScore");
+            if(GameScore>savedHighScore){
+                PlayerPrefs.SetInt("HighScore", GameScore);
+                PlayerPrefs.SetString("GameTime", SecondsToFormattedTime(totalGameSec));
+                PlayerPrefs.Save();
+            }
+        }else{
+            PlayerPrefs.SetInt("HighScore", GameScore);
+            PlayerPrefs.SetString("GameTime", SecondsToFormattedTime(totalGameSec));
+            PlayerPrefs.Save();
+        }
+    }
+    private  string SecondsToFormattedTime(int seconds)
+    {
+        TimeSpan time = TimeSpan.FromSeconds(seconds);
+        return string.Format("{0:00}:{1:00}:{2:00}", time.Hours, time.Minutes, time.Seconds);
     }
 }
